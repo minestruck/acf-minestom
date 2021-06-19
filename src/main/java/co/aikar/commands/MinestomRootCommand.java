@@ -2,17 +2,26 @@ package co.aikar.commands;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
-import net.minestom.server.command.CommandProcessor;
 import net.minestom.server.command.CommandSender;
-import net.minestom.server.entity.Player;
+import net.minestom.server.command.builder.Command;
+import net.minestom.server.command.builder.CommandContext;
+import net.minestom.server.command.builder.CommandExecutor;
+import net.minestom.server.command.builder.arguments.Argument;
+import net.minestom.server.command.builder.arguments.ArgumentDynamicStringArray;
+import net.minestom.server.command.builder.arguments.ArgumentType;
+import net.minestom.server.command.builder.condition.CommandCondition;
+import net.minestom.server.command.builder.suggestion.Suggestion;
+import net.minestom.server.command.builder.suggestion.SuggestionCallback;
+import net.minestom.server.command.builder.suggestion.SuggestionEntry;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
-public class MinestomRootCommand implements RootCommand, CommandProcessor {
+public class MinestomRootCommand extends Command implements RootCommand, CommandExecutor, CommandCondition, SuggestionCallback {
 
     private final MinestomCommandManager manager;
     private final String name;
@@ -22,8 +31,37 @@ public class MinestomRootCommand implements RootCommand, CommandProcessor {
     boolean isRegistered = false;
 
     MinestomRootCommand(MinestomCommandManager manager, String name) {
+        super(name);
         this.manager = manager;
         this.name = name;
+
+        setDefaultExecutor(this);
+    }
+
+    @Override
+    public void addChild(BaseCommand command) {
+        if (this.defCommand == null || !command.subCommands.get(BaseCommand.DEFAULT).isEmpty()) {
+            this.defCommand = command;
+
+            for(Map.Entry<String, RegisteredCommand> entry : command.subCommands.entries()) {
+                if(entry.getValue().complete.isEmpty()) {
+                    addSyntax(this, ArgumentType.Literal(entry.getKey()));
+                } else {
+                    String[] complete = entry.getValue().complete.split(" ");
+
+                    Argument<?>[] arguments = new Argument[complete.length+1];
+                    arguments[0] = ArgumentType.Literal(entry.getKey());
+
+                    for(int i=1; i<arguments.length; i++) {
+                        arguments[i] = ArgumentType.Word(complete[i-1].toLowerCase().replaceAll("[^a-z0-9/._-]", ""));
+                        arguments[i].setSuggestionCallback(this);
+                    }
+
+                    addSyntax(this, arguments);
+                }
+            }
+        }
+        addChildShared(this.children, this.subCommands, command);
     }
 
     @Override
@@ -51,44 +89,43 @@ public class MinestomRootCommand implements RootCommand, CommandProcessor {
     }
 
     @Override
-    public boolean process(@NotNull CommandSender sender, @NotNull String command, @NotNull String[] args) {
+    public void apply(@NotNull CommandSender sender, @NotNull CommandContext context) {
+        String[] args = context.getInput().split(" ");
+        String command = context.getCommandName();
         if (args.length > 0) {
             if (args[0].equalsIgnoreCase(command)) {
-                args = new String[0];
+                args = Arrays.copyOfRange(args, 1, args.length);
             }
         }
         execute(manager.getCommandIssuer(sender), command, args);
-        return true;
     }
 
     @Override
-    public boolean hasAccess(@NotNull Player player) {
+    public boolean canUse(@NotNull CommandSender player, @Nullable String commandString) {
         return hasAnyPermission(manager.getCommandIssuer(player));
     }
 
-
     @Override
-    public boolean enableWritingTracking() {
-        return true;
-    }
-
-    @Override
-    public String[] onWrite(@NotNull CommandSender sender, String text) {
-        String[] split = ACFPatterns.SPACE.split(text);
-        if (text.endsWith(" ")) {
-            split = Arrays.copyOfRange(split, 0, split.length + 1);
-            split[split.length - 1] = "";
+    public void apply(@NotNull CommandSender sender, @NotNull CommandContext context, @NotNull Suggestion suggestion) {
+        String[] args = context.getInput().split(" ");
+        String command = context.getCommandName();
+        if (args.length > 0) {
+            if (args[0].equalsIgnoreCase(command)) {
+                args = Arrays.copyOfRange(args, 1, args.length);
+            }
         }
-        return getTabCompletions(manager.getCommandIssuer(sender), split[0].substring(1), Arrays.copyOfRange(split, 1, split.length)).toArray(new String[0]);
-    }
 
-
-    @Override
-    public void addChild(BaseCommand command) {
-        if (this.defCommand == null || !command.subCommands.get(BaseCommand.DEFAULT).isEmpty()) {
-            this.defCommand = command;
+        if(context.getInput().endsWith(" ")) {
+            args = Arrays.copyOf(args, args.length+1);
+            args[args.length-1] = "";
+            suggestion.setStart(context.getInput().length() + 1);
         }
-        addChildShared(this.children, this.subCommands, command);
+
+        List<String> completions = getTabCompletions(manager.getCommandIssuer(sender), command, args);
+        for(String completion : completions) {
+            if(!context.getInput().endsWith(" ") && completion.startsWith("<") && completion.endsWith(">")) continue;
+            suggestion.addEntry(new SuggestionEntry(completion));
+        }
     }
 
     @Override

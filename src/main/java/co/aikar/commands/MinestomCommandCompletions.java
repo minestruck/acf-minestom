@@ -5,8 +5,6 @@ import net.minestom.server.chat.ChatColor;
 import net.minestom.server.command.CommandSender;
 import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.Player;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,12 +38,14 @@ public class MinestomCommandCompletions extends CommandCompletions<MinestomComma
         });
         registerCompletion("players", c -> {
             CommandSender sender = c.getSender();
-            Validate.notNull(sender, "Sender cannot be null");
+            if(sender == null) {
+                throw new RuntimeException("Sender cannot be null");
+            }
 
             ArrayList<String> matchedPlayers = new ArrayList<>();
             for (Player player : MinecraftServer.getConnectionManager().getOnlinePlayers()) {
                 String name = player.getUsername();
-                if (StringUtils.startsWithIgnoreCase(name, c.getInput())) {
+                if (name.toLowerCase().startsWith(c.getInput().toLowerCase())) {
                     matchedPlayers.add(name);
                 }
             }

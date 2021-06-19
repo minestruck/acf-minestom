@@ -1,35 +1,39 @@
-plugins {
-    id 'java'
-    id "com.github.johnrengelman.shadow" version "6.1.0"
-    id 'maven-publish'
+buildscript {
+    repositories {
+        jcenter()
+        mavenCentral()
+        maven {
+            name 'JitPack'
+            url 'https://jitpack.io'
+        }
+    }
+    dependencies {
+        //classpath 'com.github.jengelman.gradle.plugins:shadow:6.1.0'
+    }
 }
+
+apply plugin: 'java'
+//apply plugin: 'com.github.johnrengelman.shadow'
 
 group 'co.aikar'
 version '0.5.0-SNAPSHOT'
 
-sourceCompatibility = 1.11
+compileJava   {
+    sourceCompatibility = targetCompatibility = JavaVersion.VERSION_11
+}
 
 repositories {
     mavenCentral()
     maven { url 'https://repo.spongepowered.org/maven' }
-    maven { url 'https://libraries.minecraft.net' }
+    maven { url 'https://repo.velocitypowered.com/snapshots/' }
     maven { url 'https://jitpack.io' }
     maven { url 'https://repo.aikar.co/content/groups/aikar/' }
 }
 
 dependencies {
-    compileOnly 'com.github.Minestom:Minestom:32b8d83ac9'
-    compile 'co.aikar:acf-core:0.5.0-SNAPSHOT'
-}
-
-test {
-    useJUnitPlatform()
-}
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-        }
+    implementation('com.github.Minestom:Minestom:-SNAPSHOT') {
+        exclude group: "net.minestom", module: "minestom-data-full"
     }
+
+    compile 'co.aikar:acf-core:0.5.0-SNAPSHOT'
 }

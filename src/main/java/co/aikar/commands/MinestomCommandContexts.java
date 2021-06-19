@@ -79,9 +79,9 @@ public class MinestomCommandContexts extends CommandContexts<MinestomCommandExec
                 throw new InvalidCommandArgument(MinecraftMessageKeys.LOCATION_PLEASE_SPECIFY_XYZ);
             }
 
-            Float x = ACFUtil.parseFloat(split[0]);
-            Float y = ACFUtil.parseFloat(split[1]);
-            Float z = ACFUtil.parseFloat(split[2]);
+            Double x = ACFUtil.parseDouble(split[0]);
+            Double y = ACFUtil.parseDouble(split[1]);
+            Double z = ACFUtil.parseDouble(split[2]);
 
             if (sourceLoc != null && rel) {
                 x += sourceLoc.getX();
