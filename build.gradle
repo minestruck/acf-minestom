@@ -12,6 +12,7 @@ buildscript {
     }
 }
 
+apply plugin: 'java-library'
 apply plugin: 'java'
 //apply plugin: 'com.github.johnrengelman.shadow'
 
@@ -35,5 +36,5 @@ dependencies {
         exclude group: "net.minestom", module: "minestom-data-full"
     }
 
-    compile 'co.aikar:acf-core:0.5.0-SNAPSHOT'
+    api 'co.aikar:acf-core:0.5.0-SNAPSHOT'
 }

@@ -9,6 +9,7 @@ import net.minestom.server.entity.Player;
 
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.function.BiPredicate;
 
 public class MinestomCommandManager extends CommandManager<
         CommandSender,
@@ -26,12 +27,22 @@ public class MinestomCommandManager extends CommandManager<
     protected MinestomCommandCompletions completions;
     protected MinestomLocales locales;
 
+    private BiPredicate<CommandSender, String> customPermissionCheck = null;
+
     public MinestomCommandManager() {
         this.formatters.put(MessageType.ERROR, defaultFormatter = new MinestomMessageFormatter(ChatColor.RED, ChatColor.YELLOW, ChatColor.RED));
         this.formatters.put(MessageType.SYNTAX, new MinestomMessageFormatter(ChatColor.YELLOW, ChatColor.BRIGHT_GREEN, ChatColor.WHITE));
         this.formatters.put(MessageType.INFO, new MinestomMessageFormatter(ChatColor.BLUE, ChatColor.DARK_GREEN, ChatColor.BRIGHT_GREEN));
         this.formatters.put(MessageType.HELP, new MinestomMessageFormatter(ChatColor.CYAN, ChatColor.BRIGHT_GREEN, ChatColor.YELLOW));
         getLocales();
+    }
+
+    public BiPredicate<CommandSender, String> getCustomPermissionCheck() {
+        return customPermissionCheck;
+    }
+
+    public void setCustomPermissionCheck(BiPredicate<CommandSender, String> customPermissionCheck) {
+        this.customPermissionCheck = customPermissionCheck;
     }
 
     @Override

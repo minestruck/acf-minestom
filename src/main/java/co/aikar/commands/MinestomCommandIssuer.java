@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.function.BiPredicate;
 
 public class MinestomCommandIssuer implements CommandIssuer {
 
@@ -57,6 +58,13 @@ public class MinestomCommandIssuer implements CommandIssuer {
 
     @Override
     public boolean hasPermission(String permission) {
+        BiPredicate<CommandSender, String> customCheck = ((MinestomCommandManager)MinestomCommandManager.getCurrentCommandManager())
+                .getCustomPermissionCheck();
+
+        if(customCheck != null) {
+            return customCheck.test(sender, permission);
+        }
+
         return sender.hasPermission(permission);
     }
 

@@ -129,6 +129,10 @@ public class MinestomCommandContexts extends CommandContexts<MinestomCommandExec
 
 
     Player getPlayer(MinestomCommandIssuer issuer, String lookup, boolean allowMissing) throws InvalidCommandArgument {
+        if(issuer.isPlayer() && (lookup.equalsIgnoreCase("@s") || lookup.equalsIgnoreCase("@p"))) {
+            return issuer.getPlayer();
+        }
+
         Player player = ACFMinestomUtil.findPlayerSmart(issuer, lookup);
         if (player == null) {
             if (allowMissing) {
