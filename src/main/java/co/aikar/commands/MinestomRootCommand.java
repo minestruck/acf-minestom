@@ -54,7 +54,13 @@ public class MinestomRootCommand extends Command implements RootCommand, Command
                     for(int i=0; i<arguments.length; i++) {
                         String id = complete[i].toLowerCase().replaceAll("[^a-z0-9/._-]", "");
 
-                        if(complete[i].equalsIgnoreCase("@players")) {
+                        if(complete[i].equalsIgnoreCase("@float")) {
+                            arguments[i] = ArgumentType.Float(id);
+                        } else if(complete[i].equalsIgnoreCase("@integer")) {
+                            arguments[i] = ArgumentType.Integer(id);
+                        } else if(complete[i].equalsIgnoreCase("@coordRelative3")) {
+                            arguments[i] = ArgumentType.RelativeVec3(id);
+                        } else if(complete[i].equalsIgnoreCase("@players")) {
                             arguments[i] = ArgumentType.Entity(id).onlyPlayers(true);
                         } else {
                             arguments[i] = ArgumentType.String(id);
@@ -72,7 +78,13 @@ public class MinestomRootCommand extends Command implements RootCommand, Command
                     for(int i=1; i<arguments.length; i++) {
                         String id = complete[i-1].toLowerCase().replaceAll("[^a-z0-9/._-]", "");
 
-                        if(complete[i-1].equalsIgnoreCase("@players")) {
+                        if(complete[i-1].equalsIgnoreCase("@float")) {
+                            arguments[i] = ArgumentType.Float(id);
+                        } else if(complete[i-1].equalsIgnoreCase("@integer")) {
+                            arguments[i] = ArgumentType.Integer(id);
+                        } else if(complete[i-1].equalsIgnoreCase("@coordRelative3")) {
+                            arguments[i] = ArgumentType.RelativeVec3(id);
+                        } else if(complete[i-1].equalsIgnoreCase("@players")) {
                             arguments[i] = ArgumentType.Entity(id).onlyPlayers(true);
                         } else {
                             arguments[i] = ArgumentType.String(id);

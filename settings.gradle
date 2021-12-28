@@ -1,2 +1,4 @@
 rootProject.name = 'acf-minestom'
+include ':minestom'
+project(':minestom').projectDir = new File('../Minestom')
 
