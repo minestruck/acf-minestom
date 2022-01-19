@@ -14,7 +14,6 @@ import net.minestom.server.command.builder.suggestion.SuggestionCallback;
 import net.minestom.server.command.builder.suggestion.SuggestionEntry;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jglrxavpok.hephaistos.nbt.NBTReader;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,165 +22,165 @@ import java.util.Map;
 
 public class MinestomRootCommand extends Command implements RootCommand, CommandExecutor, CommandCondition, SuggestionCallback {
 
-    private final MinestomCommandManager manager;
-    private final String name;
-    private BaseCommand defCommand;
-    private SetMultimap<String, RegisteredCommand> subCommands = HashMultimap.create();
-    private List<BaseCommand> children = new ArrayList<>();
-    boolean isRegistered = false;
+	private final MinestomCommandManager manager;
+	private final String name;
+	boolean isRegistered = false;
+	private BaseCommand defCommand;
+	private SetMultimap<String, RegisteredCommand> subCommands = HashMultimap.create();
+	private List<BaseCommand> children = new ArrayList<>();
 
-    MinestomRootCommand(MinestomCommandManager manager, String name) {
-        super(name);
-        this.manager = manager;
-        this.name = name;
+	MinestomRootCommand(MinestomCommandManager manager, String name) {
+		super(name);
+		this.manager = manager;
+		this.name = name;
 
-        setDefaultExecutor(this);
-    }
+		setDefaultExecutor(this);
+	}
 
-    @Override
-    public void addChild(BaseCommand command) {
-        if (this.defCommand == null || !command.subCommands.get(BaseCommand.DEFAULT).isEmpty()) {
-            this.defCommand = command;
-            
-            for(Map.Entry<String, RegisteredCommand> entry : command.subCommands.entries()) {
-                if(entry.getValue().complete.isEmpty()) {
-                    addSyntax(this, ArgumentType.Literal(entry.getKey()));
-                } else if(entry.getKey().equals("__default")) {
-                    String[] complete = entry.getValue().complete.split(" ");
+	@Override
+	public void addChild(BaseCommand command) {
+		if (this.defCommand == null || !command.subCommands.get(BaseCommand.DEFAULT).isEmpty()) {
+			this.defCommand = command;
 
-                    Argument<?>[] arguments = new Argument[complete.length];
+			for (Map.Entry<String, RegisteredCommand> entry : command.subCommands.entries()) {
+				if (entry.getValue().complete.isEmpty()) {
+					addSyntax(this, ArgumentType.Literal(entry.getKey()));
+				} else if (entry.getKey().equals("__default")) {
+					String[] complete = entry.getValue().complete.split(" ");
 
-                    for(int i=0; i<arguments.length; i++) {
-                        String id = complete[i].toLowerCase().replaceAll("[^a-z0-9/._-]", "");
+					Argument<?>[] arguments = new Argument[complete.length];
 
-                        if(complete[i].equalsIgnoreCase("@float")) {
-                            arguments[i] = ArgumentType.Float(id);
-                        } else if(complete[i].equalsIgnoreCase("@integer")) {
-                            arguments[i] = ArgumentType.Integer(id);
-                        } else if(complete[i].equalsIgnoreCase("@coordRelative3")) {
-                            arguments[i] = ArgumentType.RelativeVec3(id);
-                        } else if(complete[i].equalsIgnoreCase("@players")) {
-                            arguments[i] = ArgumentType.Entity(id).onlyPlayers(true);
-                        } else {
-                            arguments[i] = ArgumentType.String(id);
-                            arguments[i].setSuggestionCallback(this);
-                        }
-                    }
+					for (int i = 0; i < arguments.length; i++) {
+						String id = complete[i].toLowerCase().replaceAll("[^a-z0-9/._-]", "");
 
-                    addSyntax(this, arguments);
-                } else {
-                    String[] complete = entry.getValue().complete.split(" ");
+						if (complete[i].equalsIgnoreCase("@float")) {
+							arguments[i] = ArgumentType.Float(id);
+						} else if (complete[i].equalsIgnoreCase("@integer")) {
+							arguments[i] = ArgumentType.Integer(id);
+						} else if (complete[i].equalsIgnoreCase("@coordRelative3")) {
+							arguments[i] = ArgumentType.RelativeVec3(id);
+						} else if (complete[i].equalsIgnoreCase("@players")) {
+							arguments[i] = ArgumentType.Entity(id).onlyPlayers(true);
+						} else {
+							arguments[i] = ArgumentType.String(id);
+							arguments[i].setSuggestionCallback(this);
+						}
+					}
 
-                    Argument<?>[] arguments = new Argument[complete.length+1];
-                    arguments[0] = ArgumentType.Literal(entry.getKey());
+					addSyntax(this, arguments);
+				} else {
+					String[] complete = entry.getValue().complete.split(" ");
 
-                    for(int i=1; i<arguments.length; i++) {
-                        String id = complete[i-1].toLowerCase().replaceAll("[^a-z0-9/._-]", "");
+					Argument<?>[] arguments = new Argument[complete.length + 1];
+					arguments[0] = ArgumentType.Literal(entry.getKey());
 
-                        if(complete[i-1].equalsIgnoreCase("@float")) {
-                            arguments[i] = ArgumentType.Float(id);
-                        } else if(complete[i-1].equalsIgnoreCase("@integer")) {
-                            arguments[i] = ArgumentType.Integer(id);
-                        } else if(complete[i-1].equalsIgnoreCase("@coordRelative3")) {
-                            arguments[i] = ArgumentType.RelativeVec3(id);
-                        } else if(complete[i-1].equalsIgnoreCase("@players")) {
-                            arguments[i] = ArgumentType.Entity(id).onlyPlayers(true);
-                        } else {
-                            arguments[i] = ArgumentType.String(id);
-                            arguments[i].setSuggestionCallback(this);
-                        }
-                    }
+					for (int i = 1; i < arguments.length; i++) {
+						String id = complete[i - 1].toLowerCase().replaceAll("[^a-z0-9/._-]", "");
 
-                    addSyntax(this, arguments);
-                }
-            }
-        }
-        addChildShared(this.children, this.subCommands, command);
-    }
+						if (complete[i - 1].equalsIgnoreCase("@float")) {
+							arguments[i] = ArgumentType.Float(id);
+						} else if (complete[i - 1].equalsIgnoreCase("@integer")) {
+							arguments[i] = ArgumentType.Integer(id);
+						} else if (complete[i - 1].equalsIgnoreCase("@coordRelative3")) {
+							arguments[i] = ArgumentType.RelativeVec3(id);
+						} else if (complete[i - 1].equalsIgnoreCase("@players")) {
+							arguments[i] = ArgumentType.Entity(id).onlyPlayers(true);
+						} else {
+							arguments[i] = ArgumentType.String(id);
+							arguments[i].setSuggestionCallback(this);
+						}
+					}
 
-    @Override
-    public String getDescription() {
-        RegisteredCommand command = getDefaultRegisteredCommand();
+					addSyntax(this, arguments);
+				}
+			}
+		}
+		addChildShared(this.children, this.subCommands, command);
+	}
 
-        if (command != null && !command.getHelpText().isEmpty()) {
-            return command.getHelpText();
-        }
-        if (command != null && command.scope.description != null) {
-            return command.scope.description;
-        }
-        return defCommand.getName();
-    }
+	@Override
+	public String getDescription() {
+		RegisteredCommand command = getDefaultRegisteredCommand();
 
-    @Override
-    public String getCommandName() {
-        return name;
-    }
+		if (command != null && !command.getHelpText().isEmpty()) {
+			return command.getHelpText();
+		}
+		if (command != null && command.scope.description != null) {
+			return command.scope.description;
+		}
+		return defCommand.getName();
+	}
 
-    @Nullable
-    @Override
-    public String[] getAliases() {
-        return new String[0];
-    }
+	@Override
+	public String getCommandName() {
+		return name;
+	}
 
-    @Override
-    public void apply(@NotNull CommandSender sender, @NotNull CommandContext context) {
-        String[] args = context.getInput().split(" ");
-        String command = context.getCommandName();
-        if (args.length > 0) {
-            if (args[0].equalsIgnoreCase(command)) {
-                args = Arrays.copyOfRange(args, 1, args.length);
-            }
-        }
-        execute(manager.getCommandIssuer(sender), command, args);
-    }
+	@Nullable
+	@Override
+	public String[] getAliases() {
+		return new String[0];
+	}
 
-    @Override
-    public boolean canUse(@NotNull CommandSender player, @Nullable String commandString) {
-        return hasAnyPermission(manager.getCommandIssuer(player));
-    }
+	@Override
+	public void apply(@NotNull CommandSender sender, @NotNull CommandContext context) {
+		String[] args = context.getInput().split(" ");
+		String command = context.getCommandName();
+		if (args.length > 0) {
+			if (args[0].equalsIgnoreCase(command)) {
+				args = Arrays.copyOfRange(args, 1, args.length);
+			}
+		}
+		execute(manager.getCommandIssuer(sender), command, args);
+	}
 
-    @Override
-    public void apply(@NotNull CommandSender sender, @NotNull CommandContext context, @NotNull Suggestion suggestion) {
-        String[] args = context.getInput().split(" ");
-        String command = context.getCommandName();
-        if (args.length > 0) {
-            if (args[0].equalsIgnoreCase(command)) {
-                args = Arrays.copyOfRange(args, 1, args.length);
-            }
-        }
+	@Override
+	public boolean canUse(@NotNull CommandSender player, @Nullable String commandString) {
+		return hasAnyPermission(manager.getCommandIssuer(player));
+	}
 
-        if(context.getInput().endsWith(" ")) {
-            args = Arrays.copyOf(args, args.length+1);
-            args[args.length-1] = "";
-            suggestion.setStart(context.getInput().length() + 1);
-        }
+	@Override
+	public void apply(@NotNull CommandSender sender, @NotNull CommandContext context, @NotNull Suggestion suggestion) {
+		String[] args = context.getInput().split(" ");
+		String command = context.getCommandName();
+		if (args.length > 0) {
+			if (args[0].equalsIgnoreCase(command)) {
+				args = Arrays.copyOfRange(args, 1, args.length);
+			}
+		}
 
-        List<String> completions = getTabCompletions(manager.getCommandIssuer(sender), command, args);
-        for(String completion : completions) {
-            if(!context.getInput().endsWith(" ") && completion.startsWith("<") && completion.endsWith(">")) continue;
-            suggestion.addEntry(new SuggestionEntry(completion));
-        }
-    }
+		if (context.getInput().endsWith(" ")) {
+			args = Arrays.copyOf(args, args.length + 1);
+			args[args.length - 1] = "";
+			suggestion.setStart(context.getInput().length() + 1);
+		}
 
-    @Override
-    public CommandManager getManager() {
-        return manager;
-    }
+		List<String> completions = getTabCompletions(manager.getCommandIssuer(sender), command, args);
+		for (String completion : completions) {
+			if (!context.getInput().endsWith(" ") && completion.startsWith("<") && completion.endsWith(">")) continue;
+			suggestion.addEntry(new SuggestionEntry(completion));
+		}
+	}
 
-    @Override
-    public SetMultimap<String, RegisteredCommand> getSubCommands() {
-        return this.subCommands;
-    }
+	@Override
+	public CommandManager getManager() {
+		return manager;
+	}
 
-    @Override
-    public List<BaseCommand> getChildren() {
-        return children;
-    }
+	@Override
+	public SetMultimap<String, RegisteredCommand> getSubCommands() {
+		return this.subCommands;
+	}
 
-    @Override
-    public BaseCommand getDefCommand() {
-        return defCommand;
-    }
+	@Override
+	public List<BaseCommand> getChildren() {
+		return children;
+	}
+
+	@Override
+	public BaseCommand getDefCommand() {
+		return defCommand;
+	}
 
 
 }

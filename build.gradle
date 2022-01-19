@@ -1,6 +1,6 @@
 buildscript {
     repositories {
-        jcenter()
+        //jcenter()
         mavenCentral()
         maven {
             name 'JitPack'
@@ -13,7 +13,7 @@ apply plugin: 'java-library'
 apply plugin: 'java'
 
 group 'co.aikar'
-version '0.5.0-SNAPSHOT'
+version '0.5.1-SNAPSHOT'
 
 compileJava   {
     sourceCompatibility = targetCompatibility = JavaVersion.VERSION_17
@@ -28,7 +28,6 @@ repositories {
 }
 
 dependencies {
-    implementation project(":minestom")
-
-    api 'co.aikar:acf-core:0.5.0-SNAPSHOT'
+    implementation 'com.github.minestom:minestom:-SNAPSHOT'
+    api 'co.aikar:acf-core:0.5.1-SNAPSHOT'
 }

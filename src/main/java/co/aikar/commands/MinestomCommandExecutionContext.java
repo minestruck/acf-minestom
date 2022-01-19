@@ -8,17 +8,17 @@ import java.util.Map;
 
 public class MinestomCommandExecutionContext extends CommandExecutionContext<MinestomCommandExecutionContext, MinestomCommandIssuer> {
 
-    MinestomCommandExecutionContext(RegisteredCommand cmd, CommandParameter param, MinestomCommandIssuer sender, List<String> args,
-                                    int index, Map<String, Object> passedArgs) {
-        super(cmd, param, sender, args, index, passedArgs);
-    }
+	MinestomCommandExecutionContext(RegisteredCommand cmd, CommandParameter param, MinestomCommandIssuer sender, List<String> args,
+	                                int index, Map<String, Object> passedArgs) {
+		super(cmd, param, sender, args, index, passedArgs);
+	}
 
-    public CommandSender getSender() {
-        return this.issuer.getIssuer();
-    }
+	public CommandSender getSender() {
+		return this.issuer.getIssuer();
+	}
 
-    public Player getPlayer() {
-        return this.issuer.getPlayer();
-    }
+	public Player getPlayer() {
+		return this.issuer.getPlayer();
+	}
 
 }

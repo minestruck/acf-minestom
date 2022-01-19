@@ -13,72 +13,72 @@ import java.util.function.BiPredicate;
 
 public class MinestomCommandIssuer implements CommandIssuer {
 
-    private final MinestomCommandManager manager;
-    private final CommandSender sender;
-    private final ConnectionManager connectionManager;
+	private final MinestomCommandManager manager;
+	private final CommandSender sender;
+	private final ConnectionManager connectionManager;
 
-    MinestomCommandIssuer(MinestomCommandManager manager, CommandSender sender) {
-        this.manager = manager;
-        this.sender = sender;
-        this.connectionManager = MinecraftServer.getConnectionManager();
-    }
+	MinestomCommandIssuer(MinestomCommandManager manager, CommandSender sender) {
+		this.manager = manager;
+		this.sender = sender;
+		this.connectionManager = MinecraftServer.getConnectionManager();
+	}
 
-    @Override
-    public boolean isPlayer() {
-        return sender instanceof Player;
-    }
+	@Override
+	public boolean isPlayer() {
+		return sender instanceof Player;
+	}
 
-    @Override
-    public CommandSender getIssuer() {
-        return sender;
-    }
+	@Override
+	public CommandSender getIssuer() {
+		return sender;
+	}
 
-    public Player getPlayer() {
-        return isPlayer() ? (Player) sender : null;
-    }
+	public Player getPlayer() {
+		return isPlayer() ? (Player) sender : null;
+	}
 
-    @Override
-    public @NotNull UUID getUniqueId() {
-        if (isPlayer()) {
-            Player player = (Player) sender;
-            return connectionManager.getPlayerConnectionUuid(player.getPlayerConnection(), player.getUsername());
-        }
-        return UUID.nameUUIDFromBytes("ConsoleSender".getBytes(StandardCharsets.UTF_8));
-    }
+	@Override
+	public @NotNull UUID getUniqueId() {
+		if (isPlayer()) {
+			Player player = (Player) sender;
+			return connectionManager.getPlayerConnectionUuid(player.getPlayerConnection(), player.getUsername());
+		}
+		return UUID.nameUUIDFromBytes("ConsoleSender".getBytes(StandardCharsets.UTF_8));
+	}
 
-    @Override
-    public CommandManager getManager() {
-        return manager;
-    }
+	@Override
+	public CommandManager getManager() {
+		return manager;
+	}
 
-    @Override
-    public void sendMessageInternal(String message) {
-        sender.sendMessage(ACFMinestomUtil.color(message));
-    }
+	@Override
+	public void sendMessageInternal(String message) {
+		sender.sendMessage(ACFMinestomUtil.color(message));
+	}
 
-    @Override
-    public boolean hasPermission(String permission) {
-        BiPredicate<CommandSender, String> customCheck = ((MinestomCommandManager)MinestomCommandManager.getCurrentCommandManager())
-                .getCustomPermissionCheck();
+	@Override
+	public boolean hasPermission(String permission) {
+		BiPredicate<CommandSender, String> customCheck = ((MinestomCommandManager) MinestomCommandManager.getCurrentCommandManager())
+				.getCustomPermissionCheck();
 
-        if(customCheck != null) {
-            return customCheck.test(sender, permission);
-        }
+		if (customCheck != null) {
+			return customCheck.test(sender, permission);
+		}
 
-        return sender.hasPermission(permission);
-    }
+		return sender.hasPermission(permission);
+	}
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        MinestomCommandIssuer that = (MinestomCommandIssuer) o;
-        return Objects.equals(sender, that.sender);
-    }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		MinestomCommandIssuer that = (MinestomCommandIssuer) o;
+		return Objects.equals(sender, that.sender);
+	}
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(sender);
-    }
+	@Override
+	public int hashCode() {
+		return Objects.hash(sender);
+	}
 
 }
