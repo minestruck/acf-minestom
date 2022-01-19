@@ -11,6 +11,7 @@ buildscript {
 
 apply plugin: 'java-library'
 apply plugin: 'java'
+apply plugin: 'maven-publish'
 
 group 'co.aikar'
 version '0.5.1-SNAPSHOT'
@@ -28,6 +29,18 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.minestom:minestom:-SNAPSHOT'
+    implementation 'com.github.minestom:minestom:5efa6d7980'
     api 'co.aikar:acf-core:0.5.1-SNAPSHOT'
+}
+
+publishing {
+	publications {
+		create("maven_public", MavenPublication.class) {
+			groupId = "co.aikar"
+			artifactId = "acf-minestom"
+			version = "1.0"
+			//from components.java
+			from(components.getByName("java"))
+		}
+	}
 }
