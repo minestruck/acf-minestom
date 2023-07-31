@@ -29,7 +29,8 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.minestom:minestom:5efa6d7980'
+    implementation 'com.github.Minestom:Minestom:c5047b8037'
+    api 'com.google.guava:guava:32.1.1-jre'
     api 'co.aikar:acf-core:0.5.1-SNAPSHOT'
 }
 
